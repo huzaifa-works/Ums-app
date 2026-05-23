@@ -48,10 +48,15 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const fetchClients = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("clients")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("user_id", user.id) // 🔥 yahan filter lagao
+    .order("created_at", { ascending: false });
     if (error) {
       toast({ title: "Error loading clients", description: error.message, variant: "destructive" });
     } else {

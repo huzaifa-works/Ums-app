@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { Users, Mail, Lock } from "lucide-react";
+import { dataTagErrorSymbol } from "@tanstack/react-query";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -26,17 +27,22 @@ const Auth = () => {
         if (error) throw error;
         navigate("/dashboard");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data,error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          
         });
         if (error) throw error;
+        const session = data?.session ?? null;
+        if(session){
+          navigate("/dashboard");
+
+        }else{
         toast({
           title: "Check your email",
           description: "We've sent you a confirmation link to verify your account.",
         });
-      }
+      }}
     } catch (error: any) {
       toast({
         title: "Error",
